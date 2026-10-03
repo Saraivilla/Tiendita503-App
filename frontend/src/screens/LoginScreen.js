@@ -24,7 +24,7 @@ const LoginScreen = ({ navigation }) => {
       const token = await AsyncStorage.getItem('token');
 
       if (token) {
-        navigation.replace('Home');
+        navigation.replace('MainTabs');
       }
     };
 
@@ -37,7 +37,7 @@ const LoginScreen = ({ navigation }) => {
       await AsyncStorage.setItem('user', user);
       await AsyncStorage.setItem('token', 'secure-token-1234');
 
-      navigation.replace('Home');
+      navigation.replace('MainTabs');
     } else {
       alert('Debe ingresar usuario y contraseña');
     }

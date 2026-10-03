@@ -54,23 +54,22 @@ export default function HomeScreen() {
   }, []);
 
   const handleLogout = () => {
-    Alert.alert(
-      'Cerrar Sesión',
-      '¿Estás seguro de que deseas salir?',
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Cerrar Sesión',
-          style: 'destructive',
-          onPress: async () => {
-            await AsyncStorage.removeItem('token');
-            await AsyncStorage.removeItem('user');
-            navigation.replace('Login');
-          },
+  Alert.alert(
+    'Cerrar Sesión',
+    '¿Estás seguro de que deseas salir?',
+    [
+      { text: 'Cancelar', style: 'cancel' },
+      {
+        text: 'Cerrar Sesión',
+        style: 'destructive',
+        onPress: async () => {
+          await AsyncStorage.multiRemove(['token', 'user']);
+          navigation.replace('Login');
         },
-      ]
-    );
-  };
+      },
+    ]
+  );
+};
 
   const renderCategoryIcon = (item) => {
     if (item.library === 'Ionicons') {
@@ -83,7 +82,7 @@ export default function HomeScreen() {
     <TouchableOpacity 
       style={styles.productCard}
       activeOpacity={0.8}
-      onPress={() => navigation.navigate('NuevoProductoTab', { productId: item.id, itemData: item })}
+      onPress={() => navigation.navigate('list', { productId: item.id, itemData: item })}
     >
       <View style={[styles.productIconBox, { backgroundColor: item.bgColor || '#F5F5F5' }]}>
         <Ionicons name={item.icon || 'cube-outline'} size={32} color={item.iconColor || '#2E7D32'} />
@@ -100,7 +99,7 @@ export default function HomeScreen() {
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#F9FBF8" />
       
-      {/* 1. Header Superior con acciones y Logout */}
+      {/* Header Superior */}
       <View style={styles.topHeaderWrapper}>
         <View style={styles.brandContainer}>
           <View style={styles.logoContainer}>
@@ -116,7 +115,7 @@ export default function HomeScreen() {
         <View style={styles.headerActions}>
           <TouchableOpacity 
             style={styles.profileIconButton} 
-            onPress={() => navigation.navigate('PerfilTab')} 
+            onPress={() => navigation.navigate('profile')} 
             activeOpacity={0.7}
           >
             <Ionicons name="person-outline" size={20} color="#2E7D32" />
@@ -184,7 +183,7 @@ export default function HomeScreen() {
               key={cat.id} 
               style={styles.categoryItem}
               activeOpacity={0.7}
-              onPress={() => navigation.navigate('InventarioTab', { categoryId: cat.id })}
+              onPress={() => navigation.navigate('list', { categoryId: cat.id })}
             >
               <View style={[styles.categoryIconCircle, { backgroundColor: cat.color }]}>
                 {renderCategoryIcon(cat)}
@@ -204,7 +203,7 @@ export default function HomeScreen() {
             <TouchableOpacity 
               style={styles.bannerButton}
               activeOpacity={0.8}
-              onPress={() => navigation.navigate('NuevoProductoTab')}
+              onPress={() => navigation.navigate('form')}
             >
               <Text style={styles.bannerButtonText}>+ Agregar Producto</Text>
             </TouchableOpacity>
@@ -215,7 +214,7 @@ export default function HomeScreen() {
         {/* Productos Recientes */}
         <View style={styles.sectionHeader}>
           <Text style={styles.sectionTitle}>Registrados recientemente</Text>
-          <TouchableOpacity onPress={() => navigation.navigate('InventarioTab')}>
+          <TouchableOpacity onPress={() => navigation.navigate('list')}>
             <Text style={styles.seeAllText}>Ver lista</Text>
           </TouchableOpacity>
         </View>
@@ -228,63 +227,7 @@ export default function HomeScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.productsList}
         />
-
-        {/* Tarjeta de Perfil en la parte inferior */}
-        <TouchableOpacity 
-          style={styles.profileShortcutCard}
-          activeOpacity={0.8}
-          onPress={() => navigation.navigate('PerfilTab')}
-        >
-          <View style={styles.profileAvatarBox}>
-            <Ionicons name="person-circle" size={38} color="#2E7D32" />
-          </View>
-          <View style={styles.profileInfoText}>
-            <Text style={styles.profileName}>{user || 'Mi Cuenta'}</Text>
-            <Text style={styles.profileSubtext}>Gestionar ajustes y configuración</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={20} color="#2E7D32" />
-        </TouchableOpacity>
-
       </ScrollView>
-
-      {/* Navbar Inferior Novedosa */}
-      <View style={styles.bottomNavbar}>
-        <TouchableOpacity 
-          style={styles.navItem} 
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate('HomeTab')}
-        >
-          <Ionicons name="home" size={22} color="#2E7D32" />
-          <Text style={[styles.navLabel, styles.navLabelActive]}>Inicio</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.navItem} 
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate('InventarioTab')}
-        >
-          <Ionicons name="cube-outline" size={22} color="#757575" />
-          <Text style={styles.navLabel}>Inventario</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.navAddButton} 
-          activeOpacity={0.8}
-          onPress={() => navigation.navigate('NuevoProductoTab')}
-        >
-          <Ionicons name="add" size={28} color="#FFFFFF" />
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.navItem} 
-          activeOpacity={0.7}
-          onPress={() => navigation.navigate('PerfilTab')}
-        >
-          <Ionicons name="person-outline" size={22} color="#757575" />
-          <Text style={styles.navLabel}>Perfil</Text>
-        </TouchableOpacity>
-      </View>
-
     </SafeAreaView>
   );
 }
@@ -346,7 +289,7 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingHorizontal: 18,
-    paddingBottom: 100, // Espacio suficiente para no ocultar nada tras el Navbar
+    paddingBottom: 100, 
   },
   greetingContainer: {
     marginTop: 8,
@@ -558,44 +501,6 @@ const styles = StyleSheet.create({
     color: '#D32F2F',
     fontWeight: '700',
   },
-  profileShortcutCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 14,
-    padding: 12,
-    marginTop: 26,
-    borderWidth: 1,
-    borderColor: '#E2ECE9',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.03,
-        shadowRadius: 4,
-      },
-      android: {
-        elevation: 1,
-      },
-    }),
-  },
-  profileAvatarBox: {
-    marginRight: 10,
-  },
-  profileInfoText: {
-    flex: 1,
-  },
-  profileName: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#1B4332',
-  },
-  profileSubtext: {
-    fontSize: 12,
-    color: '#666666',
-  },
-
-  /* Navbar Inferior Estilizada */
   bottomNavbar: {
     position: 'absolute',
     bottom: Platform.OS === 'ios' ? 20 : 10,

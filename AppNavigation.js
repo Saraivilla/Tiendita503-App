@@ -1,24 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { View, ActivityIndicator } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, ActivityIndicator, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import BottomNavBar from '../components/BottomNavBar';
 
-// Pantallas
-import HomeScreen from '../screens/HomeScreen';
-import ListScreen from '../screens/ListScreen';
-import DataEntryScreen from '../screens/DataEntryScreen';
-import ProfileScreen from '../screens/ProfileScreen';
-import LoginScreen from '../screens/LoginScreen';
+import BottomNavBar from './frontend/src/components/BottomNavBar';
+import HomeScreen from './frontend/src/screens/HomeScreen';
+import ListScreen from './frontend/src/screens/ListScreen';
+import DataEntryScreen from './frontend/src/screens/DataEntryScreen';
+// import ProfileScreen from './frontend/src/screens/ProfileScreen'; 
+import LoginScreen from './frontend/src/screens/LoginScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
-
-// --- Navegación por Pestañas (Tab Navigator) ---
-import BottomNavBar from '../components/BottomNavBar';
 
 function MainTabNavigator() {
   return (
@@ -26,16 +21,16 @@ function MainTabNavigator() {
       tabBar={(props) => <BottomNavBar {...props} />}
       screenOptions={{ headerShown: false }}
     >
-      <Tab.Screen name="InicioTab" component={HomeScreen} />
-      <Tab.Screen name="InventarioTab" component={ListScreen} />
-      <Tab.Screen name="NuevoProductoTab" component={DataEntryScreen} />
-      <Tab.Screen name="PerfilTab" component={ProfileScreen} />
+      <Tab.Screen name="home" component={HomeScreen} />
+      <Tab.Screen name="list" component={ListScreen} />
+      <Tab.Screen name="form" component={DataEntryScreen} />
+      <Tab.Screen name="profile" component={""} />
     </Tab.Navigator>
   );
 }
 
-// --- Navegador Raíz (Stack Navigator) ---
-export default function AppNavigator() {
+// Navegador Principal del Stack
+export default function AppNavigation() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -45,7 +40,7 @@ export default function AppNavigator() {
         const token = await AsyncStorage.getItem('token');
         setIsAuthenticated(!!token);
       } catch (e) {
-        console.error('Error verificando token:', e);
+        console.error('Error al verificar sesión:', e);
       } finally {
         setIsLoading(false);
       }
@@ -55,7 +50,7 @@ export default function AppNavigator() {
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F9FBF8' }}>
         <ActivityIndicator size="large" color="#2E7D32" />
       </View>
     );
@@ -63,27 +58,31 @@ export default function AppNavigator() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator screenOptions={{ headerShown: false }}>
-        {!isAuthenticated ? (
-          <Stack.Screen name="Login" component={LoginScreen} />
-        ) : (
-          <>
-            {/* Contenedor Principal de Frames */}
-            <Stack.Screen name="MainTabs" component={MainTabNavigator} />
-            
-            {/* Pantalla modal/stack para Edición de Productos */}
-            <Stack.Screen 
-              name="DataEntry" 
-              component={DataEntryScreen} 
-              options={{
-                headerShown: true,
-                title: 'Editar Producto',
-                headerTintColor: '#2E7D32',
-                headerStyle: { backgroundColor: '#F9FBF8' },
-              }}
-            />
-          </>
-        )}
+      <Stack.Navigator
+        initialRouteName={isAuthenticated ? 'MainTabs' : 'Login'}
+        screenOptions={{
+          headerShown: false,
+          animation: 'slide_from_right',
+        }}
+      >
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="MainTabs" component={MainTabNavigator} />
+        
+        {/* Pantalla de formulario presentada como Modal */}
+        <Stack.Screen 
+          name="form" 
+          component={DataEntryScreen} 
+          options={{
+            presentation: 'modal',
+            animation: 'slide_from_bottom',
+            headerShown: true,
+            title: 'Registrar Producto',
+            headerTintColor: '#2E7D32',
+            headerStyle: { backgroundColor: '#F9FBF8' },
+          }}
+        />
+        <Stack.Screen name="list" component={ListScreen} />
+        <Stack.Screen name="profile" component={""} />
       </Stack.Navigator>
     </NavigationContainer>
   );

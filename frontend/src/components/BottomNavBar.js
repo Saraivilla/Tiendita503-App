@@ -1,59 +1,52 @@
 import React from 'react';
 import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
 
-export default function BottomNavBar() {
-  const navigation = useNavigation();
-  const route = useRoute();
-
-  // Definición de las rutas del menú inferior
-  const tabs = [
-    {
-      name: 'InicioTab',
-      label: 'Inicio',
-      activeIcon: 'home',
-      inactiveIcon: 'home-outline',
-    },
-    {
-      name: 'InventarioTab',
-      label: 'Productos',
-      activeIcon: 'list',
-      inactiveIcon: 'list-outline',
-    },
-    {
-      name: 'NuevoProductoTab',
-      label: 'Agregar',
-      activeIcon: 'add-circle',
-      inactiveIcon: 'add-circle-outline',
-    },
-    {
-      name: 'PerfilTab',
-      label: 'Perfil',
-      activeIcon: 'person',
-      inactiveIcon: 'person-outline',
-    },
-  ];
+export default function BottomNavBar({ state, descriptors, navigation }) {
+  // Mapeo de configuración visual por ruta
+  const tabConfig = {
+    home: { label: 'Inicio', activeIcon: 'home', inactiveIcon: 'home-outline' },
+    list: { label: 'Productos', activeIcon: 'list', inactiveIcon: 'list-outline' },
+    form: { label: 'Agregar', activeIcon: 'add-circle', inactiveIcon: 'add-circle-outline' },
+    profile: { label: 'Perfil', activeIcon: 'person', inactiveIcon: 'person-outline' },
+  };
 
   return (
     <View style={styles.container}>
-      {tabs.map((tab) => {
-        const isFocused = route.name === tab.name;
+      {state.routes.map((route, index) => {
+        const isFocused = state.index === index;
+        const config = tabConfig[route.name] || {
+          label: route.name,
+          activeIcon: 'ellipse',
+          inactiveIcon: 'ellipse-outline',
+        };
+
+        const onPress = () => {
+          const event = navigation.emit({
+            type: 'tabPress',
+            target: route.key,
+            canPreventDefault: true,
+          });
+
+          if (!isFocused && !event.defaultPrevented) {
+            navigation.navigate(route.name);
+          }
+        };
 
         return (
           <TouchableOpacity
-            key={tab.name}
+            key={route.key}
             style={styles.tabButton}
             activeOpacity={0.7}
-            onPress={() => navigation.navigate(tab.name)}
+            onPress={onPress}
           >
             <Ionicons
-              name={isFocused ? tab.activeIcon : tab.inactiveIcon}
+              name={isFocused ? config.activeIcon : config.inactiveIcon}
               size={22}
               color={isFocused ? '#2E7D32' : '#888888'}
             />
             <Text style={[styles.tabLabel, { color: isFocused ? '#2E7D32' : '#888888' }]}>
-              {tab.label}
+              {config.label}
             </Text>
           </TouchableOpacity>
         );
@@ -65,14 +58,19 @@ export default function BottomNavBar() {
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
-    height: 60,
+    height: Platform.OS === 'ios' ? 75 : 62,
     backgroundColor: '#FFFFFF',
     borderTopWidth: 1,
     borderTopColor: '#E0E0E0',
     alignItems: 'center',
     justifyContent: 'space-around',
-    paddingBottom: Platform.OS === 'ios' ? 10 : 4,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 6,
     paddingTop: 6,
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
   },
   tabButton: {
     flex: 1,
