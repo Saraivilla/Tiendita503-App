@@ -47,7 +47,7 @@ export default function ListScreen({ navigation }) {
       <TouchableOpacity
         style={styles.card}
         activeOpacity={0.8}
-        onPress={() => navigation.navigate("DataEntry", { id: item.id })}
+        onPress={() => navigation.navigate("MainTabs", { id: item.id })}
       >
         <View style={styles.iconCircle}>
           <Ionicons name="cube-outline" size={24} color={colors.primary} />
@@ -97,7 +97,7 @@ export default function ListScreen({ navigation }) {
           onChangeText={setSearch}
         />
         {search.length > 0 && (
-          <TouchableOpacity onPress={() => setSearch("")}>
+          <TouchableOpacity onPress={() => setSearch("form")}>
             <Ionicons name="close-circle" size={20} color={colors.muted} />
           </TouchableOpacity>
         )}
@@ -127,7 +127,7 @@ export default function ListScreen({ navigation }) {
       <TouchableOpacity
         style={styles.fab}
         activeOpacity={0.85}
-        onPress={() => navigation.navigate("DataEntry")}
+        onPress={() => navigation.navigate("form")}
       >
         <Ionicons name="add" size={32} color="#fff" />
       </TouchableOpacity>
