@@ -9,7 +9,7 @@ import BottomNavBar from './frontend/src/components/BottomNavBar';
 import HomeScreen from './frontend/src/screens/HomeScreen';
 import ListScreen from './frontend/src/screens/ListScreen';
 import DataEntryScreen from './frontend/src/screens/DataEntryScreen';
-// import ProfileScreen from './frontend/src/screens/ProfileScreen'; 
+import ProfileScreen from './frontend/src/screens/ProfileScreen'; 
 import LoginScreen from './frontend/src/screens/LoginScreen';
 
 const Stack = createNativeStackNavigator();
@@ -24,7 +24,7 @@ function MainTabNavigator() {
       <Tab.Screen name="home" component={HomeScreen} />
       <Tab.Screen name="list" component={ListScreen} />
       <Tab.Screen name="form" component={DataEntryScreen} />
-      <Tab.Screen name="profile" component={""} />
+      <Tab.Screen name="profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
 }
@@ -82,7 +82,7 @@ export default function AppNavigation() {
           }}
         />
         <Stack.Screen name="list" component={ListScreen} />
-        <Stack.Screen name="profile" component={""} />
+        <Stack.Screen name="profile" component={ProfileScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
