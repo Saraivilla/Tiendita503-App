@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { colors } from "../theme";
 import {
   View,
   Text,
@@ -9,6 +9,7 @@ import {
   StyleSheet,
   ScrollView,
   Image,
+  Alert,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -39,7 +40,13 @@ const LoginScreen = ({ navigation }) => {
 
       navigation.replace('Home');
     } else {
-      alert('Debe ingresar usuario y contraseña');
+      Alert.alert(
+      "Error",
+      `Debe ingresar usuario y contraseña`,
+      [
+        { text: "Aceptar", style: "cancel" }
+      ],
+    );
     }
   };
   return (
@@ -177,11 +184,12 @@ const LoginScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#FFFDF7',
+    backgroundColor:colors.bg,
   },
 
   container: {
     flex: 1,
+    backgroundColor:colors.bg
   },
 
   scrollContainer: {
@@ -208,12 +216,14 @@ const styles = StyleSheet.create({
    */
   header: {
     marginBottom: 25,
+    alignContent: 'center',
+    alignItems: 'center'
   },
 
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: '#263238',
+    color: colors.primary,
     marginBottom: 7,
   },
 
@@ -232,7 +242,7 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     fontWeight: '600',
-    color: '#37474F',
+    color: colors.text,
     marginBottom: 8,
   },
 
@@ -243,9 +253,9 @@ const styles = StyleSheet.create({
   inputContainer: {
     height: 54,
     borderWidth: 1.5,
-    borderColor: '#DCE5D8',
+    borderColor: colors.border,
     borderRadius: 20,
-    backgroundColor: '#F8FAF6',
+    backgroundColor: colors.input,
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 15,
@@ -259,7 +269,7 @@ const styles = StyleSheet.create({
     flex: 1,
     height: '100%',
     fontSize: 15,
-    color: '#263238',
+    color: colors.text,
   },
   /*
    * RECUPERAR CONTRASEÑA
@@ -267,10 +277,12 @@ const styles = StyleSheet.create({
   forgotContainer: {
     alignItems: 'flex-end',
     marginTop: 12,
+    alignContent: 'center',
+    alignItems: 'center'
   },
 
   forgotText: {
-    color: '#2E7D32',
+    color: colors.primary,
     fontSize: 14,
     fontWeight: '600',
   },
@@ -281,7 +293,7 @@ const styles = StyleSheet.create({
   loginButton: {
     height: 54,
     borderRadius: 14,
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     marginTop: 24,
     flexDirection: 'row',
     justifyContent: 'center',
@@ -289,7 +301,7 @@ const styles = StyleSheet.create({
   },
 
   loginButtonText: {
-    color: '#FFFFFF',
+    color: colors.card,
     fontSize: 17,
     fontWeight: '700',
     marginRight: 10,
@@ -307,12 +319,12 @@ const styles = StyleSheet.create({
   separator: {
     flex: 1,
     height: 1,
-    backgroundColor: '#DCE5D8',
+    backgroundColor: colors.muted,
   },
 
   separatorText: {
     marginHorizontal: 15,
-    color: '#90A4AE',
+    color: colors.muted,
     fontSize: 14,
   },
 
@@ -333,7 +345,7 @@ const styles = StyleSheet.create({
   registerLink: {
     fontSize: 15,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: colors.primary,
   },
 });
 
