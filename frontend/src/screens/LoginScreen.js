@@ -212,6 +212,7 @@ const makeStyles = (colors) => StyleSheet.create({
    */
   header: {
     marginBottom: 25,
+    alignItems: 'center',
   },
 
   title: {
@@ -270,7 +271,7 @@ const makeStyles = (colors) => StyleSheet.create({
    * RECUPERAR CONTRASEÑA
    */
   forgotContainer: {
-    alignItems: 'flex-end',
+    alignItems: 'center',
     marginTop: 12,
   },
 
