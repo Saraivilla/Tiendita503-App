@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -16,6 +16,7 @@ import {
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import { useTheme } from '../context/ThemeContext';
 
 // Categorías del inventario
 const Categories = [
@@ -36,6 +37,9 @@ const Recent_Inventory = [
 
 export default function HomeScreen() {
   const navigation = useNavigation();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   const [user, setUser] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -54,22 +58,22 @@ export default function HomeScreen() {
   }, []);
 
   const handleLogout = () => {
-  Alert.alert(
-    'Cerrar Sesión',
-    '¿Estás seguro de que deseas salir?',
-    [
-      { text: 'Cancelar', style: 'cancel' },
-      {
-        text: 'Cerrar Sesión',
-        style: 'destructive',
-        onPress: async () => {
-          await AsyncStorage.multiRemove(['token', 'user']);
-          navigation.replace('Login');
+    Alert.alert(
+      'Cerrar Sesión',
+      '¿Estás seguro de que deseas salir?',
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Cerrar Sesión',
+          style: 'destructive',
+          onPress: async () => {
+            await AsyncStorage.multiRemove(['token', 'user']);
+            navigation.replace('Login');
+          },
         },
-      },
-    ]
-  );
-};
+      ]
+    );
+  };
 
   const renderCategoryIcon = (item) => {
     if (item.library === 'Ionicons') {
@@ -84,8 +88,8 @@ export default function HomeScreen() {
       activeOpacity={0.8}
       onPress={() => navigation.navigate('list', { productId: item.id, itemData: item })}
     >
-      <View style={[styles.productIconBox, { backgroundColor: item.bgColor || '#F5F5F5' }]}>
-        <Ionicons name={item.icon || 'cube-outline'} size={32} color={item.iconColor || '#2E7D32'} />
+      <View style={[styles.productIconBox, { backgroundColor: item.bgColor || colors.soft }]}>
+        <Ionicons name={item.icon || 'cube-outline'} size={32} color={item.iconColor || colors.primary} />
       </View>
       <Text style={styles.productName} numberOfLines={1}>{item.name}</Text>
       <Text style={styles.productPrice}>{item.price}</Text>
@@ -97,7 +101,6 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" backgroundColor="#F9FBF8" />
       
       {/* Header Superior */}
       <View style={styles.topHeaderWrapper}>
@@ -118,11 +121,11 @@ export default function HomeScreen() {
             onPress={() => navigation.navigate('profile')} 
             activeOpacity={0.7}
           >
-            <Ionicons name="person-outline" size={20} color="#2E7D32" />
+            <Ionicons name="person-outline" size={20} color={colors.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.logoutIconButton} onPress={handleLogout} activeOpacity={0.7}>
-            <MaterialCommunityIcons name="logout" size={20} color="#D32F2F" />
+            <MaterialCommunityIcons name="logout" size={20} color={colors.danger} />
           </TouchableOpacity>
         </View>
       </View>
@@ -139,37 +142,37 @@ export default function HomeScreen() {
         {/* Tarjetas de Métricas */}
         <View style={styles.metricsContainer}>
           <View style={styles.metricCard}>
-            <View style={[styles.metricIconCircle, { backgroundColor: '#EAF8EA' }]}>
-              <Ionicons name="cube-outline" size={18} color="#2E7D32" />
+            <View style={[styles.metricIconCircle, { backgroundColor: colors.soft }]}>
+              <Ionicons name="cube-outline" size={18} color={colors.primary} />
             </View>
             <Text style={styles.metricNumber}>124</Text>
             <Text style={styles.metricLabel}>Total Productos</Text>
           </View>
 
           <View style={styles.metricCard}>
-            <View style={[styles.metricIconCircle, { backgroundColor: '#FFEBEE' }]}>
-              <Ionicons name="alert-circle-outline" size={18} color="#D32F2F" />
+            <View style={[styles.metricIconCircle, { backgroundColor: colors.dangerSoft }]}>
+              <Ionicons name="alert-circle-outline" size={18} color={colors.danger} />
             </View>
-            <Text style={[styles.metricNumber, { color: '#D32F2F' }]}>8</Text>
+            <Text style={[styles.metricNumber, { color: colors.danger }]}>8</Text>
             <Text style={styles.metricLabel}>Bajo Stock</Text>
           </View>
 
           <View style={styles.metricCard}>
-            <View style={[styles.metricIconCircle, { backgroundColor: '#E3F2FD' }]}>
-              <Ionicons name="grid-outline" size={18} color="#1976D2" />
+            <View style={[styles.metricIconCircle, { backgroundColor: colors.soft }]}>
+              <Ionicons name="grid-outline" size={18} color={colors.primary} />
             </View>
-            <Text style={[styles.metricNumber, { color: '#1976D2' }]}>6</Text>
+            <Text style={[styles.metricNumber, { color: colors.primary }]}>6</Text>
             <Text style={styles.metricLabel}>Categorías</Text>
           </View>
         </View>
 
         {/* Buscador */}
         <View style={styles.searchContainer}>
-          <Ionicons name="search-outline" size={20} color="#888888" style={styles.searchIcon} />
+          <Ionicons name="search-outline" size={20} color={colors.muted} style={styles.searchIcon} />
           <TextInput
             style={styles.searchInput}
             placeholder="Buscar por código o producto..."
-            placeholderTextColor="#999999"
+            placeholderTextColor={colors.muted}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
@@ -208,7 +211,7 @@ export default function HomeScreen() {
               <Text style={styles.bannerButtonText}>+ Agregar Producto</Text>
             </TouchableOpacity>
           </View>
-          <MaterialCommunityIcons name="package-variant-closed" size={60} color="#2E7D32" />
+          <MaterialCommunityIcons name="package-variant-closed" size={60} color={colors.primary} />
         </View>
 
         {/* Productos Recientes */}
@@ -232,10 +235,10 @@ export default function HomeScreen() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: '#F9FBF8',
+    backgroundColor: colors.bg,
     paddingTop: Platform.OS === 'android' ? StatusBar.currentHeight + 8 : 8,
   },
   topHeaderWrapper: {
@@ -244,7 +247,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 18,
     paddingBottom: 12,
-    backgroundColor: '#F9FBF8',
+    backgroundColor: colors.bg,
   },
   brandContainer: {
     flexDirection: 'row',
@@ -263,7 +266,7 @@ const styles = StyleSheet.create({
   brandTitle: {
     fontSize: 20,
     fontWeight: '700',
-    color: '#2E7D32',
+    color: colors.primary,
     marginLeft: 8,
   },
   headerActions: {
@@ -274,7 +277,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#EAF8EA',
+    backgroundColor: colors.soft,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 8,
@@ -283,7 +286,7 @@ const styles = StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 19,
-    backgroundColor: '#FFEBEE',
+    backgroundColor: colors.dangerSoft,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -297,11 +300,11 @@ const styles = StyleSheet.create({
   greetingTitle: {
     fontSize: 24,
     fontWeight: 'bold',
-    color: '#1B4332',
+    color: colors.text,
   },
   greetingSubtitle: {
     fontSize: 13,
-    color: '#666666',
+    color: colors.muted,
     marginTop: 2,
   },
   metricsContainer: {
@@ -311,7 +314,7 @@ const styles = StyleSheet.create({
   },
   metricCard: {
     flex: 1,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.card,
     borderRadius: 14,
     paddingVertical: 12,
     paddingHorizontal: 8,
@@ -340,17 +343,17 @@ const styles = StyleSheet.create({
   metricNumber: {
     fontSize: 17,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   metricLabel: {
     fontSize: 11,
-    color: '#777777',
+    color: colors.muted,
     marginTop: 2,
   },
   searchContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.card,
     borderRadius: 12,
     paddingHorizontal: 14,
     height: 46,
@@ -373,12 +376,12 @@ const styles = StyleSheet.create({
   searchInput: {
     flex: 1,
     fontSize: 14,
-    color: '#333333',
+    color: colors.text,
   },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '700',
-    color: '#1B4332',
+    color: colors.text,
     marginTop: 22,
     marginBottom: 12,
   },
@@ -403,11 +406,11 @@ const styles = StyleSheet.create({
   categoryText: {
     fontSize: 12,
     textAlign: 'center',
-    color: '#444444',
+    color: colors.text,
     lineHeight: 15,
   },
   bannerContainer: {
-    backgroundColor: '#EAF8EA',
+    backgroundColor: colors.soft,
     borderRadius: 16,
     padding: 16,
     flexDirection: 'row',
@@ -421,15 +424,15 @@ const styles = StyleSheet.create({
   bannerTitle: {
     fontSize: 15,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: colors.primary,
   },
   bannerDescription: {
     fontSize: 12,
-    color: '#4F6D54',
+    color: colors.muted,
     marginVertical: 4,
   },
   bannerButton: {
-    backgroundColor: '#2E7D32',
+    backgroundColor: colors.primary,
     paddingVertical: 8,
     paddingHorizontal: 14,
     borderRadius: 20,
@@ -437,7 +440,7 @@ const styles = StyleSheet.create({
     marginTop: 6,
   },
   bannerButtonText: {
-    color: '#FFFFFF',
+    color: colors.onPrimary,
     fontSize: 12,
     fontWeight: '700',
   },
@@ -448,7 +451,7 @@ const styles = StyleSheet.create({
   },
   seeAllText: {
     fontSize: 13,
-    color: '#2E7D32',
+    color: colors.primary,
     fontWeight: '700',
   },
   productsList: {
@@ -457,7 +460,7 @@ const styles = StyleSheet.create({
   },
   productCard: {
     width: 130,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: colors.card,
     borderRadius: 14,
     padding: 10,
     marginRight: 12,
@@ -484,82 +487,21 @@ const styles = StyleSheet.create({
   productName: {
     fontSize: 13,
     fontWeight: '600',
-    color: '#333333',
+    color: colors.text,
   },
   productPrice: {
     fontSize: 13,
     fontWeight: 'bold',
-    color: '#2E7D32',
+    color: colors.primary,
     marginTop: 2,
   },
   stockText: {
     fontSize: 11,
-    color: '#777777',
+    color: colors.muted,
     marginTop: 2,
   },
   lowStockText: {
-    color: '#D32F2F',
+    color: colors.danger,
     fontWeight: '700',
-  },
-  bottomNavbar: {
-    position: 'absolute',
-    bottom: Platform.OS === 'ios' ? 20 : 10,
-    left: 18,
-    right: 18,
-    height: 64,
-    backgroundColor: '#FFFFFF',
-    borderRadius: 32,
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    borderWidth: 1,
-    borderColor: '#EAF0EA',
-    ...Platform.select({
-      ios: {
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 10,
-      },
-      android: {
-        elevation: 8,
-      },
-    }),
-  },
-  navItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    flex: 1,
-  },
-  navLabel: {
-    fontSize: 10,
-    color: '#757575',
-    marginTop: 2,
-    fontWeight: '500',
-  },
-  navLabelActive: {
-    color: '#2E7D32',
-    fontWeight: '700',
-  },
-  navAddButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: '#2E7D32',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: -20,
-    ...Platform.select({
-      ios: {
-        shadowColor: '#2E7D32',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 6,
-      },
-      android: {
-        elevation: 6,
-      },
-    }),
   },
 });

@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { colors } from "../theme";
+import { useTheme } from '../context/ThemeContext';
+
 import {
   View,
   Text,
@@ -9,7 +10,6 @@ import {
   StyleSheet,
   ScrollView,
   Image,
-  Alert,
 } from 'react-native';
 
 import { Ionicons } from '@expo/vector-icons';
@@ -18,6 +18,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const LoginScreen = ({ navigation }) => {
   const [user, setUser] = useState('');
   const [password, setPassword] = useState('');
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
 
   // Validación de Token
   useEffect(() => {
@@ -40,156 +42,150 @@ const LoginScreen = ({ navigation }) => {
 
       navigation.replace('MainTabs');
     } else {
-      Alert.alert(
-      "Error",
-      `Debe ingresar usuario y contraseña`,
-      [
-        { text: "Aceptar", style: "cancel" }
-      ],
-    );
+      alert('Debe ingresar usuario y contraseña');
     }
   };
+
   return (
     <SafeAreaView style={styles.safeArea}>
-        <ScrollView
-          contentContainerStyle={styles.scrollContainer}
-          showsVerticalScrollIndicator={false}
-        >
-          {/* Logo */}
-          <View style={styles.logoContainer}>
-            <Image
-              source={require('../../../assets/logo-tiendita.png')}
-              style={styles.logo}
-              resizeMode="contain"
+      <ScrollView
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Logo */}
+        <View style={styles.logoContainer}>
+          <Image
+            source={require('../../../assets/logo-tiendita.png')}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </View>
+
+        {/* Encabezado */}
+        <View style={styles.header}>
+          <Text style={styles.title}>
+            ¡Bienvenido!
+          </Text>
+
+          <Text style={styles.subtitle}>
+            Ingresa para continuar
+          </Text>
+        </View>
+
+        {/* Formulario */}
+        <View style={styles.form}>
+
+          {/* Usuario */}
+          <Text style={styles.label}>
+            Usuario
+          </Text>
+
+          <View style={styles.inputContainer}>
+            <Ionicons
+              name="person-outline"
+              size={22}
+              color={colors.muted}
+              style={styles.inputIcon}
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="user123"
+              placeholderTextColor={colors.muted}
+              value={user}
+              onChangeText={setUser}
+              autoCapitalize="none"
+              autoCorrect={false}
             />
           </View>
 
-          {/* Encabezado */}
-          <View style={styles.header}>
-            <Text style={styles.title}>
-              ¡Bienvenido!
-            </Text>
+          {/* Contraseña */}
+          <Text style={[styles.label, styles.passwordLabel]}>
+            Contraseña
+          </Text>
 
-            <Text style={styles.subtitle}>
-              Ingresa para continuar
-            </Text>
+          <View style={styles.inputContainer}>
+            <Ionicons
+              name="lock-closed-outline"
+              size={22}
+              color={colors.muted}
+              style={styles.inputIcon}
+            />
+
+            <TextInput
+              style={styles.input}
+              placeholder="••••••••"
+              placeholderTextColor={colors.muted}
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              autoCapitalize="none"
+            />
           </View>
 
-          {/* Formulario */}
-          <View style={styles.form}>
+          {/* Recuperar contraseña */}
+          <TouchableOpacity
+            style={styles.forgotContainer}
+          >
+            <Text style={styles.forgotText}>
+              ¿Olvidaste tu contraseña?
+            </Text>
+          </TouchableOpacity>
 
-            {/* Uuario */}
-            <Text style={styles.label}>
-              Usuario
+          {/* Botón Login */}
+          <TouchableOpacity
+            style={styles.loginButton}
+            activeOpacity={0.8}
+            onPress={handleLogin}
+          >
+            <Text style={styles.loginButtonText}>
+              Ingresar
             </Text>
 
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="person-outline"
-                size={22}
-                color="#78909C"
-                style={styles.inputIcon}
-              />
+            <Ionicons
+              name="arrow-forward"
+              size={22}
+              color={colors.onPrimary}
+            />
+          </TouchableOpacity>
 
-              <TextInput
-                style={styles.input}
-                placeholder="user123"
-                placeholderTextColor="#90A4AE"
-                value={user}
-                onChangeText={setUser}
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
+          {/* Separador */}
+          <View style={styles.separatorContainer}>
+            <View style={styles.separator} />
 
-            {/* Contraseña */}
-            <Text style={[styles.label, styles.passwordLabel]}>
-              Contraseña
+            <Text style={styles.separatorText}>
+              o
             </Text>
 
-            <View style={styles.inputContainer}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={22}
-                color="#78909C"
-                style={styles.inputIcon}
-              />
-
-              <TextInput
-                style={styles.input}
-                placeholder="••••••••"
-                placeholderTextColor="#90A4AE"
-                value={password}
-                onChangeText={setPassword}
-                secureTextEntry
-                autoCapitalize="none"
-              />
-            </View>
-
-            {/* Recuperar contraseña */}
-            <TouchableOpacity
-              style={styles.forgotContainer}
-            >
-              <Text style={styles.forgotText}>
-                ¿Olvidaste tu contraseña?
-              </Text>
-            </TouchableOpacity>
-
-            {/* Botón Login */}
-            <TouchableOpacity
-              style={styles.loginButton}
-              activeOpacity={0.8}
-              onPress={handleLogin}
-            >
-              <Text style={styles.loginButtonText}>
-                Ingresar
-              </Text>
-
-              <Ionicons
-                name="arrow-forward"
-                size={22}
-                color="#FFFFFF"
-              />
-            </TouchableOpacity>
-
-            {/* Separador */}
-            <View style={styles.separatorContainer}>
-              <View style={styles.separator} />
-
-              <Text style={styles.separatorText}>
-                o
-              </Text>
-
-              <View style={styles.separator} />
-            </View>
-
-            {/* Registro */}
-            <View style={styles.registerContainer}>
-              <Text style={styles.registerText}>
-                ¿No tienes una cuenta?
-              </Text>
-
-              <TouchableOpacity>
-                <Text style={styles.registerLink}>
-                  Crear cuenta
-                </Text>
-              </TouchableOpacity>
-            </View>
+            <View style={styles.separator} />
           </View>
-        </ScrollView>
+
+          {/* Registro */}
+          <View style={styles.registerContainer}>
+            <Text style={styles.registerText}>
+              ¿No tienes una cuenta?
+            </Text>
+
+            <TouchableOpacity>
+              <Text style={styles.registerLink}>
+                Crear cuenta
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) => StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor:colors.bg,
+    backgroundColor: colors.bg,
   },
 
   container: {
     flex: 1,
-    backgroundColor:colors.bg
   },
 
   scrollContainer: {
@@ -216,20 +212,18 @@ const styles = StyleSheet.create({
    */
   header: {
     marginBottom: 25,
-    alignContent: 'center',
-    alignItems: 'center'
   },
 
   title: {
     fontSize: 28,
     fontWeight: '700',
-    color: colors.primary,
+    color: colors.text,
     marginBottom: 7,
   },
 
   subtitle: {
     fontSize: 17,
-    color: '#78909C',
+    color: colors.muted,
   },
 
   /*
@@ -271,14 +265,13 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: colors.text,
   },
+
   /*
    * RECUPERAR CONTRASEÑA
    */
   forgotContainer: {
     alignItems: 'flex-end',
     marginTop: 12,
-    alignContent: 'center',
-    alignItems: 'center'
   },
 
   forgotText: {
@@ -301,7 +294,7 @@ const styles = StyleSheet.create({
   },
 
   loginButtonText: {
-    color: colors.card,
+    color: colors.onPrimary,
     fontSize: 17,
     fontWeight: '700',
     marginRight: 10,
@@ -319,7 +312,7 @@ const styles = StyleSheet.create({
   separator: {
     flex: 1,
     height: 1,
-    backgroundColor: colors.muted,
+    backgroundColor: colors.border,
   },
 
   separatorText: {
@@ -338,7 +331,7 @@ const styles = StyleSheet.create({
 
   registerText: {
     fontSize: 14,
-    color: '#78909C',
+    color: colors.muted,
     marginBottom: 5,
   },
 

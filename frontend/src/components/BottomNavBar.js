@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useMemo } from 'react'; 
 import { View, TouchableOpacity, Text, StyleSheet, Platform } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useTheme } from '../context/ThemeContext'; 
 
 export default function BottomNavBar({ state, descriptors, navigation }) {
-  // Mapeo de configuración visual por ruta
+  const { colors } = useTheme(); 
+  const styles = useMemo(() => makeStyles(colors), [colors]); 
+
   const tabConfig = {
     home: { label: 'Inicio', activeIcon: 'home', inactiveIcon: 'home-outline' },
     list: { label: 'Productos', activeIcon: 'list', inactiveIcon: 'list-outline' },
@@ -33,6 +36,8 @@ export default function BottomNavBar({ state, descriptors, navigation }) {
           }
         };
 
+        const tint = isFocused ? colors.primary : colors.muted; 
+
         return (
           <TouchableOpacity
             key={route.key}
@@ -43,9 +48,9 @@ export default function BottomNavBar({ state, descriptors, navigation }) {
             <Ionicons
               name={isFocused ? config.activeIcon : config.inactiveIcon}
               size={22}
-              color={isFocused ? '#2E7D32' : '#888888'}
+              color={tint} 
             />
-            <Text style={[styles.tabLabel, { color: isFocused ? '#2E7D32' : '#888888' }]}>
+            <Text style={[styles.tabLabel, { color: tint }]}> 
               {config.label}
             </Text>
           </TouchableOpacity>
@@ -55,13 +60,13 @@ export default function BottomNavBar({ state, descriptors, navigation }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (c) => StyleSheet.create({ 
   container: {
     flexDirection: 'row',
     height: Platform.OS === 'ios' ? 75 : 62,
-    backgroundColor: '#FFFFFF',
+    backgroundColor: c.card, 
     borderTopWidth: 1,
-    borderTopColor: '#E0E0E0',
+    borderTopColor: c.border, 
     alignItems: 'center',
     justifyContent: 'space-around',
     paddingBottom: Platform.OS === 'ios' ? 20 : 6,

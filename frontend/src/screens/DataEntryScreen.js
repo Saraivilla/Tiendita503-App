@@ -1,5 +1,5 @@
 // frontend/src/screens/DataEntryScreen.js
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -14,17 +14,17 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useSQLiteContext } from "expo-sqlite";
-import { colors } from "../theme";
+import { useTheme } from "../context/ThemeContext";
 
-function Field({ label, icon, style, multiline, ...props }) {
+function Field({ label, icon, style, multiline, fieldStyles, ...props }) {
   return (
-    <View style={[styles.fieldWrap, style]}>
-      <Text style={styles.label}>{label}</Text>
-      <View style={[styles.inputBox, multiline && styles.inputBoxMultiline]}>
-        <Ionicons name={icon} size={20} color={colors.muted} />
+    <View style={[fieldStyles.fieldWrap, style]}>
+      <Text style={fieldStyles.label}>{label}</Text>
+      <View style={[fieldStyles.inputBox, multiline && fieldStyles.inputBoxMultiline]}>
+        <Ionicons name={icon} size={20} color={props.iconColor} />
         <TextInput
-          style={[styles.input, multiline && { textAlignVertical: "top" }]}
-          placeholderTextColor={colors.muted}
+          style={[fieldStyles.input, multiline && { textAlignVertical: "top" }]}
+          placeholderTextColor={props.placeholderColor}
           multiline={multiline}
           {...props}
         />
@@ -35,6 +35,9 @@ function Field({ label, icon, style, multiline, ...props }) {
 
 export default function DataEntryScreen({ navigation, route }) {
   const db = useSQLiteContext();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   const id = route.params?.id;
   const isEditing = !!id;
 
@@ -190,6 +193,9 @@ export default function DataEntryScreen({ navigation, route }) {
             placeholder="Ej. Agua 600ml"
             value={name}
             onChangeText={setName}
+            fieldStyles={styles}
+            iconColor={colors.muted}
+            placeholderColor={colors.muted}
           />
           <Field
             label="SKU"
@@ -198,6 +204,9 @@ export default function DataEntryScreen({ navigation, route }) {
             autoCapitalize="characters"
             value={sku}
             onChangeText={setSku}
+            fieldStyles={styles}
+            iconColor={colors.muted}
+            placeholderColor={colors.muted}
           />
           <Field
             label="Categoría"
@@ -205,6 +214,9 @@ export default function DataEntryScreen({ navigation, route }) {
             placeholder="Ej. Bebidas"
             value={category}
             onChangeText={setCategory}
+            fieldStyles={styles}
+            iconColor={colors.muted}
+            placeholderColor={colors.muted}
           />
 
           <View style={styles.row}>
@@ -216,6 +228,9 @@ export default function DataEntryScreen({ navigation, route }) {
               keyboardType="decimal-pad"
               value={price}
               onChangeText={setPrice}
+              fieldStyles={styles}
+              iconColor={colors.muted}
+              placeholderColor={colors.muted}
             />
             <View style={{ width: 12 }} />
             <Field
@@ -226,6 +241,9 @@ export default function DataEntryScreen({ navigation, route }) {
               keyboardType="number-pad"
               value={stock}
               onChangeText={setStock}
+              fieldStyles={styles}
+              iconColor={colors.muted}
+              placeholderColor={colors.muted}
             />
           </View>
 
@@ -236,6 +254,9 @@ export default function DataEntryScreen({ navigation, route }) {
             keyboardType="number-pad"
             value={minStock}
             onChangeText={setMinStock}
+            fieldStyles={styles}
+            iconColor={colors.muted}
+            placeholderColor={colors.muted}
           />
           <Field
             label="Notas"
@@ -244,6 +265,9 @@ export default function DataEntryScreen({ navigation, route }) {
             multiline
             value={notes}
             onChangeText={setNotes}
+            fieldStyles={styles}
+            iconColor={colors.muted}
+            placeholderColor={colors.muted}
           />
 
           <TouchableOpacity
@@ -255,7 +279,7 @@ export default function DataEntryScreen({ navigation, route }) {
             <Text style={styles.saveText}>
               {isEditing ? "Guardar cambios" : "Guardar producto"}
             </Text>
-            <Ionicons name="arrow-forward" size={20} color="#fff" />
+            <Ionicons name="arrow-forward" size={20} color={colors.onPrimary} />
           </TouchableOpacity>
 
           {isEditing && (
@@ -270,7 +294,7 @@ export default function DataEntryScreen({ navigation, route }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   header: {
     flexDirection: "row",
@@ -326,7 +350,7 @@ const styles = StyleSheet.create({
     borderRadius: 27,
     backgroundColor: colors.primary,
   },
-  saveText: { color: "#fff", fontSize: 17, fontWeight: "700" },
+  saveText: { color: colors.onPrimary, fontSize: 17, fontWeight: "700" },
   deleteBtn: {
     flexDirection: "row",
     alignItems: "center",

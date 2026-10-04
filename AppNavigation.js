@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { View, ActivityIndicator, Text } from 'react-native';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useEffect, useState } from "react";
+import { View, ActivityIndicator, Text } from "react-native";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-import BottomNavBar from './frontend/src/components/BottomNavBar';
-import HomeScreen from './frontend/src/screens/HomeScreen';
-import ListScreen from './frontend/src/screens/ListScreen';
-import DataEntryScreen from './frontend/src/screens/DataEntryScreen';
-import ProfileScreen from './frontend/src/screens/ProfileScreen'; 
-import LoginScreen from './frontend/src/screens/LoginScreen';
+import BottomNavBar from "./frontend/src/components/BottomNavBar";
+import HomeScreen from "./frontend/src/screens/HomeScreen";
+import ListScreen from "./frontend/src/screens/ListScreen";
+import DataEntryScreen from "./frontend/src/screens/DataEntryScreen";
+import ProfileScreen from "./frontend/src/screens/ProfileScreen";
+import LoginScreen from "./frontend/src/screens/LoginScreen";
+import { StatusBar } from "expo-status-bar";
+import { useTheme } from "./frontend/src/context/ThemeContext";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -24,7 +26,11 @@ function MainTabNavigator() {
       <Tab.Screen name="home" component={HomeScreen} />
       <Tab.Screen name="list" component={ListScreen} />
       <Tab.Screen name="form" component={DataEntryScreen} />
-      <Tab.Screen name="profile" component={ProfileScreen} />
+      <Tab.Screen
+        name="profile"
+        component={ProfileScreen}
+        options={{ headerShown: true, title: "Mi perfil" }}
+      />
     </Tab.Navigator>
   );
 }
@@ -33,14 +39,15 @@ function MainTabNavigator() {
 export default function AppNavigation() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const { navTheme, colors, isDark, themeLoaded } = useTheme();
 
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const token = await AsyncStorage.getItem('token');
+        const token = await AsyncStorage.getItem("token");
         setIsAuthenticated(!!token);
       } catch (e) {
-        console.error('Error al verificar sesión:', e);
+        console.error("Error al verificar sesión:", e);
       } finally {
         setIsLoading(false);
       }
@@ -48,41 +55,54 @@ export default function AppNavigation() {
     checkAuthStatus();
   }, []);
 
-  if (isLoading) {
+  if (isLoading || !themeLoaded) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F9FBF8' }}>
-        <ActivityIndicator size="large" color="#2E7D32" />
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: colors.bg,
+        }}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
       </View>
     );
   }
 
   return (
-    <NavigationContainer>
+    <NavigationContainer theme={navTheme}>
+      <StatusBar style={isDark ? "light" : "dark"} />
       <Stack.Navigator
-        initialRouteName={isAuthenticated ? 'MainTabs' : 'Login'}
+        initialRouteName={isAuthenticated ? "MainTabs" : "Login"}
         screenOptions={{
           headerShown: false,
-          animation: 'slide_from_right',
+          animation: "slide_from_right",
         }}
       >
         <Stack.Screen name="Login" component={LoginScreen} />
         <Stack.Screen name="MainTabs" component={MainTabNavigator} />
-        
+
         {/* Pantalla de formulario presentada como Modal */}
-        <Stack.Screen 
-          name="form" 
-          component={DataEntryScreen} 
+        <Stack.Screen
+          name="form"
+          component={DataEntryScreen}
           options={{
-            presentation: 'modal',
-            animation: 'slide_from_bottom',
+            presentation: "modal",
+            animation: "slide_from_bottom",
             headerShown: true,
-            title: 'Registrar Producto',
-            headerTintColor: '#2E7D32',
-            headerStyle: { backgroundColor: '#F9FBF8' },
+            title: "Registrar Producto",
+            headerTintColor: colors.primary,
+            headerStyle: { backgroundColor: colors.bg },
+            headerTitleStyle: { color: colors.text },
           }}
         />
         <Stack.Screen name="list" component={ListScreen} />
-        <Stack.Screen name="profile" component={ProfileScreen} />
+        <Stack.Screen
+          name="profile"
+          component={ProfileScreen}
+          options={{ headerShown: true, title: "Mi perfil" }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );

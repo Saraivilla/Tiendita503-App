@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import {
   View,
   Text,
@@ -11,10 +11,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { Ionicons } from "@expo/vector-icons";
 import { useFocusEffect } from "@react-navigation/native";
 import { useSQLiteContext } from "expo-sqlite";
-import { colors } from "../theme";
+import { useTheme } from "../context/ThemeContext";
 
 export default function ListScreen({ navigation }) {
   const db = useSQLiteContext();
+  const { colors } = useTheme();
+  const styles = useMemo(() => makeStyles(colors), [colors]);
+
   const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
 
@@ -97,7 +100,7 @@ export default function ListScreen({ navigation }) {
           onChangeText={setSearch}
         />
         {search.length > 0 && (
-          <TouchableOpacity onPress={() => setSearch("form")}>
+          <TouchableOpacity onPress={() => setSearch("")}>
             <Ionicons name="close-circle" size={20} color={colors.muted} />
           </TouchableOpacity>
         )}
@@ -125,17 +128,17 @@ export default function ListScreen({ navigation }) {
       />
 
       <TouchableOpacity
-        style={styles.fab}
+        style={[styles.fab, { backgroundColor: colors.primary }]}
         activeOpacity={0.85}
         onPress={() => navigation.navigate("form")}
       >
-        <Ionicons name="add" size={32} color="#fff" />
+        <Ionicons name="add" size={32} color={colors.onPrimary} />
       </TouchableOpacity>
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors) => StyleSheet.create({
   container: { flex: 1, backgroundColor: colors.bg },
   header: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 8 },
   title: { fontSize: 28, fontWeight: "800", color: colors.primary },
@@ -185,7 +188,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: colors.soft,
   },
-  badgeLow: { backgroundColor: "#FBE9E7" },
+  badgeLow: { backgroundColor: colors.dangerSoft },
   badgeText: { fontSize: 12, fontWeight: "600", color: colors.primary },
   badgeTextLow: { color: colors.danger },
   empty: {
@@ -208,7 +211,6 @@ const styles = StyleSheet.create({
     width: 62,
     height: 62,
     borderRadius: 31,
-    backgroundColor: colors.primary,
     alignItems: "center",
     justifyContent: "center",
     elevation: 6,
